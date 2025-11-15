@@ -26,7 +26,7 @@ This system enables users to upload documents (PDF/TXT), ask questions about the
 
 ### Intelligent Booking System
 - Natural Language Processing: Extract booking details from conversational text
-  - Example: "Book for John Doe on 2025-12-25 at 14:00, email john@example.com"
+  - Example: "Book for Kishor at 2025-04-10 at 2 pm , email kishor@yahoo.com"
 - Automatic Validation:
   - Email format verification
   - Future date validation
@@ -65,7 +65,7 @@ This system enables users to upload documents (PDF/TXT), ask questions about the
 
 This is the fastest way to get started if you just want to use the system without dealing with the source code.
 
-1. Create a folder and add docker-compose.yml:
+1. Create a folder and add `docker-compose.yml`:
 ```yaml
 services:
   qdrant:
@@ -90,7 +90,7 @@ volumes:
   qdrant_storage:
 ```
 
-2. Replace your_groq_api_key_here with your actual Groq API key
+2. Replace your_groq_api with your actual Groq API key
 
 3. Run:
 ```bash
