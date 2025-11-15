@@ -1,0 +1,40 @@
+
+# Web Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Data Validation
+pydantic==2.5.0
+pydantic-settings==2.1.0
+email-validator==2.1.0
+
+# Database
+sqlalchemy==2.0.23
+
+# Vector Database
+qdrant-client==1.7.0
+
+# Embeddings & NLP 
+sentence-transformers==2.7.0
+torch==2.3.0
+transformers==4.40.0
+
+# LLM Integration
+groq==0.4.1
+
+# Text Processing
+langchain==0.1.20
+langchain-community==0.0.38
+pdfplumber==0.10.3
+
+# File Handling
+python-multipart==0.0.6
+
+# Environment & Configuration
+python-dotenv==1.0.0
+
+# HTTP Client
+httpx==0.25.2
+
+# Utilities
+python-dateutil==2.8.2
