@@ -52,6 +52,12 @@ This system enables users to upload documents (PDF/TXT), ask questions about the
 - Text Processing: LangChain, pdfplumber
 - Containerization: Docker & Docker Compose
 
+## Demo Video
+
+Click below to watch the demo:
+
+[Watch Demo Video (Google Drive)](https://drive.google.com/file/d/1qfL5TPl0jvJuhMVumKjXtC8ILye64_LU/view?usp=sharing)
+
 ## Getting Started
 
 ### Prerequisites
