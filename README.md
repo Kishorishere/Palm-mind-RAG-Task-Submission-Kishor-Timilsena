@@ -1,77 +1,42 @@
-# RAG Backend - Document Q&A & Booking System
+# RAG Backend - Document Q&A and Booking System
 
-A production-ready Retrieval-Augmented Generation (RAG) backend built with FastAPI, featuring intelligent document processing, conversational AI, and automated booking management.
+## Introduction
 
-## Project Overview
+This is a backend system that lets you upload documents and ask questions about them using AI. It uses Retrieval-Augmented Generation to find relevant information from your documents and generate accurate answers with source citations. The system also includes a booking feature where you can create appointments through natural language. Built with FastAPI, it uses Qdrant for vector search, Redis for conversation memory, and Groq's LLM for generating responses.
 
-This system enables users to upload documents (PDF/TXT), ask questions about their content using natural language, and create bookings through conversational interfaces. It uses modern AI technologies to provide accurate, context-aware responses with source citations.
+## Key Features and Tools
 
-## Key Features
+### Document Processing
+- Extracts text from PDF and TXT files.
+- Splits content into fixed-size or recursive semantic chunks.
+- **Tools:** pdfplumber, LangChain text splitters
 
-### Document Ingestion & Processing
-- File Upload: Support for PDF and TXT documents
-- Smart Chunking: Two strategies available
-  - Fixed: Simple character-based splitting with configurable size and overlap
-  - Recursive: Semantic-aware splitting that maintains context (recommended)
-- Vector Embeddings: Automatic generation using sentence-transformers (all-MiniLM-L6-v2)
-- Metadata Storage: SQLite database for document tracking and chunk managment
-- Vector Storage: Qdrant for efficient semantic search
+### Vector Store (Qdrant)
+- Generates 384-dimensional embeddings using sentence-transformers.
+- Stores vectors and performs fast similarity search for relevant chunks.
+- **Tools:** all-MiniLM-L6-v2, Qdrant
 
-### Conversational RAG (Retrieval-Augmented Generation)
-- Context-Aware Q&A: Ask questions about uploaded documents
-- Multi-turn Conversations: Maintains conversation history for coherant interactions
-- Source Attribution: Every answer includes citations with similarity scores
-- Document Filtering: Search within specific documents or across all uploaded content
-- Groq LLM Integration: Fast, accurate responses using llama-3.1-8b-instant model
+### Conversational AI
+- Answers questions using retrieved document chunks with citations.
+- Maintains conversation context using Redis for follow-up queries.
+- **Tools:** Groq API (llama-3.1-8b-instant), Redis
 
-### Intelligent Booking System
-- Natural Language Processing: Extract booking details from conversational text
-  - Example: "Book for Kishor at 2025-04-10 at 2 pm , email kishortimilsena2@gmail.com"
-- Automatic Validation:
-  - Email format verification
-  - Future date validation
-  - Business hours checking (9 AM - 5 PM)
-- Booking Management: Create, view, update status, and delete bookings
-- Session Tracking: Link bookings to conversation sessions
+### Booking System
+- Extracts appointment details from natural language.
+- Validates email, date, and business hours before saving.
+- **Tools:** Groq API (entity extraction), SQLite
 
-### Additional Features
-- RESTful API with clean and well-documented endpoints
-- error handling with meaningfull error messages
-- Detailed application and error logs
-- CORS support for frontend integration
-- Health check endpoints for monitoring
-- simple frontend for basic use
-
-## Tech Stack
-
-- Framework: FastAPI
-- LLM: Groq (llama-3.1-8b-instant)
-- Embeddings: sentence-transformers (all-MiniLM-L6-v2, 384 dimensions)
-- Vector Database: Qdrant
-- Relational Database: SQLite
-- Text Processing: LangChain, pdfplumber
-- Containerization: Docker & Docker Compose
-
-## Demo Video
-
-Click below to watch the demo:
-
-[Watch Demo Video (Google Drive)](https://drive.google.com/file/d/1qfL5TPl0jvJuhMVumKjXtC8ILye64_LU/view?usp=sharing)
 
 ## Getting Started
 
-### Prerequisites
-- Option 1 & 2: Docker & Docker Compose
-- Option 3: Python 3.12+, Docker (for Qdrant only)
-- All Options: Groq API key (get free at console.groq.com)
+You need a Groq API key to use this system. Get one free at console.groq.com
 
----
+### Option 1: Using Docker Hub Image
 
-### Option 1: Quick Start with Docker Hub (No Code Needed)
+This is the fastest way to get started. You just need Docker installed on your computer.
 
-This is the fastest way to get started if you just want to use the system without dealing with the source code.
+Create a new folder and add a file called `docker-compose.yml`:
 
-1. Create a folder and add `docker-compose.yml`:
 ```yaml
 services:
   qdrant:
@@ -81,185 +46,121 @@ services:
     volumes:
       - qdrant_storage:/qdrant/storage
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
   rag-backend:
     image: kishorishere/rag-backend:latest
     ports:
       - "8000:8000"
     environment:
-      - GROQ_API_KEY=your_groq_api ## add your groq api (email back if needed)
+      - GROQ_API_KEY=your_groq_api
       - QDRANT_URL=http://qdrant:6333
-      - GROQ_MODEL=llama-3.1-8b-instant
+      - REDIS_URL=redis://redis:6379
     depends_on:
       - qdrant
+      - redis
 
 volumes:
   qdrant_storage:
+  redis_data:
 ```
 
-2. Replace your_groq_api with your actual Groq API key
+Replace your_groq_api with your actual Groq API key, then run:
 
-3. Run:
 ```bash
 docker-compose up
 ```
 
-4. Access the application:
-   - Frontend UI: http://localhost:8000/frontend
-   - API Documentation: http://localhost:8000/docs
-   - Qdrant Dashboard: http://localhost:6333/dashboard
+The application will start on http://localhost:8000
 
----
+Access the frontend at http://localhost:8000/frontend or the API documentation at http://localhost:8000/docs
 
-### Option 2: Clone Repository & Run with Docker
+### Option 2: Running from Source
 
-Good for development or if you want to customize the code.
+Clone the repository:
 
-1. Clone the repository:
 ```bash
-git clone https://github.com/Kishorishere/Palm-mind-RAG-Task-Submission-Kishor-Timilsena.git
-cd Palm-mind-RAG-Task-Submission-Kishor-Timilsena
+git clone https://github.com/Kishorishere/RAG-Document-QnA-backend.git
+cd RAG-Document-QnA-backend
 ```
 
-2. Create .env file:
-```bash
-cp .env.example .env
-```
+Create a virtual environment and install dependencies:
 
-3. Edit .env and add your Groq API key:
-```bash
-GROQ_API_KEY=your_groq
-```
-
-4. Run with Docker Compose:
-```bash
-docker-compose up --build
-```
-
-5. Access the application:
-   - Frontend UI: http://localhost:8000/frontend
-   - API Documentation: http://localhost:8000/docs
-
----
-
-### Option 3: Manual Setup (Without Docker Compose)
-
-Useful for development with hot reload or if you want to understand how everything works.
-
-1. Clone the repository:
-```bash
-git clone https://github.com/Kishorishere/Palm-mind-RAG-Task-Submission-Kishor-Timilsena.git
-cd Palm-mind-RAG-Task-Submission-Kishor-Timilsena
-```
-
-2. Create and activate virtual enviroment:
 ```bash
 python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-```
-
-3. Install dependencies:
-```bash
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 pip install email-validator
 ```
 
-4. Create .env file:
+Create a .env file in the project root:
+
 ```bash
 cp .env.example .env
 ```
 
-5. Edit .env and add your Groq API key
+Edit the .env file and add your Groq API key:
 
-6. Start Qdrant (in a separate terminal):
-```bash
-docker run -d -p 6333:6333 qdrant/qdrant
+```
+GROQ_API_KEY=your_groq_api
+REDIS_URL=redis://localhost:6379
+QDRANT_URL=http://localhost:6333
 ```
 
-7. Run the application:
+Start Qdrant and Redis using Docker:
+
+```bash
+docker run -d -p 6333:6333 --name qdrant qdrant/qdrant
+docker run -d -p 6379:6379 --name redis redis:7-alpine
+```
+
+Run the application:
+
 ```bash
 python run.py
 ```
 
-8. Access the application:
-   - Frontend UI: http://localhost:8000/frontend
-   - API Documentation: http://localhost:8000/docs
-
----
+The application will start on http://localhost:8000
 
 ## Using the Application
 
-### Frontend Interface (http://localhost:8000/frontend)
+### 1. Web Interface
 
-The web interface has three main sections:
+Go to http://localhost:8000/frontend to use the web interface. You can upload documents, ask questions, and create bookings all from one page.
 
-1. Upload Document
-   - Select PDF or TXT file
-   - Choose chunking strategy (recursive is usualy better)
-   - Upload and wait for processing
-   - You'll get a document ID after upload
+Upload a document by selecting a PDF or TXT file and choosing the chunking strategy. The system will process it and give you a document ID.
 
-2. Ask Questions
-   - Enter session ID (like "user-session-1")
-   - Type your question about the documents you uploaded
-   - Get answers with source citations
-   - Your conversation history is saved
+Ask questions in the chat section. Just type your question and the system will search through your documents and give you an answer with sources.
 
-3. Create Booking
-   - Use natural language to specify booking details
-   - Example: "Book for Alice Smith on 2025-12-20 at 14:00, email alice@example.com"
-   - System validates and creates booking automatically
+Create bookings by typing something like "Book an appointment for Sarah on 2025-12-20 at 3pm, email sarah@example.com"
 
-### API Documentation (http://localhost:8000/docs)
+### 2. API Documentation
 
-Interactive Swagger UI for all endpoints:
+Go to http://localhost:8000/docs for interactive API documentation. You can test all endpoints directly from your browser.
 
-#### Document Ingestion Endpoints
-- POST /api/v1/ingest - Upload document
-- GET /api/v1/documents - List all documents
-- GET /api/v1/documents/{id} - Get document details
-- DELETE /api/v1/documents/{id} - Delete document
-- GET /api/v1/documents/{id}/chunks - View document chunks
+Main endpoints:
+- POST /api/v1/ingest - Upload documents
+- POST /api/v1/chat - Ask questions
+- POST /api/v1/booking - Create bookings
+- GET /api/v1/documents - List uploaded documents
+- GET /api/v1/chat/history/{session_id} - View conversation history
 
-#### Conversation Endpoints
-- POST /api/v1/chat - Ask question with RAG
-- GET /api/v1/chat/history/{session_id} - Get conversation history
-- DELETE /api/v1/chat/history/{session_id} - Clear history
-- GET /api/v1/chat/sessions - List all sessions
+### Docker Hub
 
-#### Booking Endpoints
-- POST /api/v1/booking - Create booking from text
-- GET /api/v1/booking - List all bookings
-- GET /api/v1/booking/{id} - Get booking details
-- PATCH /api/v1/booking/{id} - Update booking status
-- DELETE /api/v1/booking/{id} - Delete booking
-- GET /api/v1/booking/session/{session_id} - Get session bookings
+Pre-built image: kishorishere/rag-backend
 
----
+The image is automatically built and published through GitHub Actions whenever code is pushed to the master branch.
 
-
-
-## Docker Hub
-
-Pre-built image available at: kishorishere/rag-backend
-
-```bash
-docker pull kishorishere/rag-backend:latest
-```
-
----
-
-## Architecture
-
-- Modular Design: Clear separation of concerns with service layers
-- Dependency Injection: Uses FastAPI dependencies for clean code
-- Singleton Patterns: Efficient resource management for embeddings
-- Error Handling: Custom exceptions with proper error responses
-- Type Safety: Pydantic models for validation
-- Logging: Structured logging throughout the application
-
-
-## Author
+### Author
 
 Kishor Timilsena
-- GitHub: @Kishorishere
-- Docker Hub: kishorishere
+GitHub: github.com/Kishorishere
+Docker Hub: hub.docker.com/u/kishorishere
+
+
+Thanks for checking out this project. If you have any suggestions or run into issues, feel free to open an issue on GitHub.
